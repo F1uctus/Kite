@@ -1,0 +1,78 @@
+[Rainmeter]
+    Update=40
+    AccurateText=1
+
+[Variables]
+    @includecfg=#@#Config.inc
+    skinw=(#s# * 500)
+    skinh=(#s# * 70)
+
+[BG]
+    Meter=Shape
+    MeterStyle=BackgroundStyle
+
+[MeasureAudio]
+    Measure=Plugin
+    Plugin=AudioLevel
+    Port=Output
+    FFTSize=1024
+    FFTAttack=15
+    FFTDecay=230
+    Bands=50
+
+;#macro
+for i in range(50):
+    print(f"""
+    [MeasureBand{i}]
+        Measure=Plugin
+        Plugin=AudioLevel
+        Parent=MeasureAudio
+        Type=Band
+        BandIdx={13 + i}
+    """)
+;#endmacro
+
+[MeterBand0]
+    Meter=Bar
+    MeasureName=MeasureBand0
+    X=(#s# * 27)
+    Y=(#s# * 15)
+    W=(#s# * 3)
+    H=(#s# * 20)
+    BarColor=#accentcolor#
+    SolidColor=200,200,200,20
+    BarOrientation=Vertical
+
+;#macro
+for i in range(1, 35):
+    print(f"""
+    [MeterBand{i}]
+        Meter=Bar
+        MeasureName=MeasureBand{i}
+        MeterStyle=MeterBand0
+        X=(#s# * 10)R
+    """)
+;#endmacro
+
+[MeterBand0Inverse]
+    Meter=Bar
+    MeasureName=MeasureBand0
+    X=(#s# * 27)
+    Y=(#skinh# / 2)
+    W=(#s# * 3)
+    H=(#s# * 20)
+    BarColor=#accentcolor#
+    SolidColor=200,200,200,20
+    BarOrientation=Vertical
+    Flip=1
+
+;#macro
+for i in range(1, 35):
+    print(f"""
+    [MeterBand{i}Inverse]
+        Meter=Bar
+        MeasureName=MeasureBand{i}
+        MeterStyle=MeterBand0Inverse
+        X=(#s# * 10)R
+    """)
+;#endmacro
