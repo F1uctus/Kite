@@ -7,4 +7,4 @@ Also, this skin pack has configurable scale and colors (`Config.inc` variables).
 
 ## Screenshots
 
-![Kite-alpha1](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-alpha1.png)
+![Kite-alpha1](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-alpha2.png)
