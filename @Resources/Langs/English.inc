@@ -33,3 +33,4 @@
     december=December
     ;
     searchboxdefault=Type here to search everywhere
+    loading=N/A
