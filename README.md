@@ -8,6 +8,8 @@ Skin pack has configurable scale, colors, 2 themes and English/Russian localizat
 
 ## Screenshots
 
+![Kite](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-beta1.png)
+
 ![Kite](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-alpha3.png)
 
 ![Kite2](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-alpha3b.png)
