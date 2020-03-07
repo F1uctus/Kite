@@ -1,2 +1,4 @@
-/Timetable
-/pyrmont_build.bat
+/.vscode
+/Timetable/last-schedule.txt
+__pycache__/
+*.py[cod]

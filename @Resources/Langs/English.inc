@@ -1,4 +1,4 @@
-; This is an file with Rainmeter skin translations to Russian.
+; This file contains Rainmeter skin translations to English.
 ; If you want to translate your skin to another language:
 ; - Copy this file and rename it to <lang_name>.inc
 ; - Replace all variable values below with translated ones
