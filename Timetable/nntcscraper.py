@@ -26,7 +26,9 @@ class Lesson:
         self.place = place
 
     def __str__(self):
-        return f"'{self.pair_num}'\t'{self.discipline}'\t'{self.teacher}'\t'{self.place}'"
+        return (
+            f"'{self.pair_num}'\t'{self.discipline}'\t'{self.teacher}'\t'{self.place}'"
+        )
 
 
 SCHEDULE_URL = "https://nntc.nnov.ru/sites/default/files/sched/zameny.html"
@@ -47,7 +49,7 @@ def request_schedule(group_name: str) -> Dict[str, Lesson]:
         if course == 0:
             course = 1
         group_name = f"{course}{group_name}"
-    
+
     page = requests.get(SCHEDULE_URL)
     tables = BeautifulSoup(page.content, "html.parser").find_all("table")
 
@@ -79,11 +81,16 @@ def request_schedule(group_name: str) -> Dict[str, Lesson]:
         # prettify lessons
         for i, lesson in enumerate(lesson_rows):
             cells = [cell for cell in lesson.find_all("td") if cell.text.strip() != ""]
-            teacher = cells[0].text if len(cells) > 0 else ""
-            discipline = cells[1].text if len(cells) > 1 else "Нет"
-            pair_num = cells[2].text if len(cells) > 2 else ""
-            place = cells[3].text if len(cells) > 3 else ""
-            lessons.append(Lesson(teacher, discipline, pair_num, place))
+            if len(cells) == 2:
+                # probably: <pair_num> <нет>
+                lessons.append(Lesson(discipline=cells[0].text, pair_num=cells[1].text))
+            elif len(cells) == 4:
+                # <teacher> <discipline> <pair_num> <place>
+                lessons.append(
+                    Lesson(cells[0].text, cells[1].text, cells[2].text, cells[3].text)
+                )
+            else:
+                lessons.append(Lesson(pair_num="N/A"))
         days[day_name] = lessons
     return days
 
@@ -108,4 +115,3 @@ if __name__ == "__main__":
 
     days = request_schedule(group_name)
     save_schedule(work_dir, days)
-

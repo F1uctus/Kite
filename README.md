@@ -2,19 +2,20 @@
 
 ## Small Rainmeter skin-pack with great flexibility
 
-This is made as a PoC of [pyrmont](https://github.com/F1uctus/pyrmont) code generation tool.
-Skin pack has configurable scale, colors, 2 themes and English/Russian localizations
-(see `Config.inc`).
+This suite was made to show [pyrmont](https://github.com/F1uctus/pyrmont) static skin generator possibilities.
+
+`Config.inc` can be edited to use custom suite scale, colors, dark/light themes and English/Russian localizations.
+
+## Requirements
 
 To get Kite fully working, you must have Python 3 installed on your machine.
 After download, run `setup.bat` script to install missing Python modules.
 
 Also, this skin pack uses the [`FrostedGlass`](https://github.com/TheAzack9/FrostedGlass) plugin.
 
+There is a micro C# program to allow to get Windows accent color,
+so you'll need .NET Framework 4.7.2 or greater.
+
 ## Screenshots
 
-![Kite](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-beta2.png)
-
-![Kite](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-alpha3.png)
-
-![Kite2](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-alpha3b.png)
+![Kite](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-beta3.png)

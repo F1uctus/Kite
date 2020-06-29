@@ -1,4 +1,6 @@
-/.vscode
-/Timetable/last-schedule.txt
+.vscode/
+/Timetable/
+/Weather/
 __pycache__/
 *.py[cod]
+AccentColorSyncer/last-accent-color.txt
