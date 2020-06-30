@@ -18,4 +18,6 @@ so you'll need .NET Framework 4.7.2 or greater.
 
 ## Screenshots
 
-![Kite](https://github.com/F1uctus/Kite/blob/master/%40Images/Kite-beta3.png)
+![Kite](https://github.com/F1uctus/Kite/blob/master/%40Screenshots/Kite-beta3.png)
+
+![Kite](https://github.com/F1uctus/Kite/blob/master/%40Screenshots/Kite-beta3b.png)
