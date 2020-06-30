@@ -9,7 +9,6 @@ This suite was made to show [pyrmont](https://github.com/F1uctus/pyrmont) static
 ## Requirements
 
 To get Kite fully working, you must have Python 3 installed on your machine.
-After download, run `setup.bat` script to install missing Python modules.
 
 Also, this skin pack uses the [`FrostedGlass`](https://github.com/TheAzack9/FrostedGlass) plugin.
 
