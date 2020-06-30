@@ -1,4 +1,4 @@
-# Kite <img align="left" width=48 height=48 src="https://github.com/F1uctus/Kite/blob/master/%40Images/Kite.jpg">
+# Kite <img align="left" width=48 height=48 src="https://github.com/F1uctus/Kite/blob/master/%40Screenshots/Kite.jpg">
 
 ## Small Rainmeter skin-pack with great flexibility
 
