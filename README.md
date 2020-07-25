@@ -12,7 +12,7 @@ To get Kite fully working, you must have Python 3 installed on your machine.
 
 Also, this skin pack uses the [`FrostedGlass`](https://github.com/TheAzack9/FrostedGlass) plugin.
 
-There is a micro C# program to allow to get Windows accent color,
+There is a micro C# program allowing to get Windows accent color,
 so you'll need .NET Framework 4.7.2 or greater.
 
 ## Screenshots
