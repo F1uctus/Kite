@@ -4,3 +4,6 @@
 __pycache__/
 *.py[cod]
 AccentColorSyncer/last-accent-color.txt
+GitHub/Feed/last-request.txt
+GitHub/Feed/token-github-feed.txt
+osu!/Stats/DownloadFile
