@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 
 def get_token() -> str:
-    with open('token-github-feed.txt', 'r') as f:
+    with open('token-github-feed.ignore.txt', 'r') as f:
         return f.read()
 
 
@@ -25,7 +25,7 @@ if __name__ == "__main__":
     entry = BeautifulSoup(page.content, "html.parser").feed.entry
 
     i = 0
-    with open("last-request.txt", "w") as out_file:
+    with open("last-request.ignore.txt", "w") as out_file:
         while entry is not None and i < limit:
             title = entry.title.string
             description_div = BeautifulSoup(

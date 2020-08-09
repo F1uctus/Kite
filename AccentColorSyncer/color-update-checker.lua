@@ -8,7 +8,7 @@ function Initialize()
 end
 
 function Update()
-    oldColor = ReadFile("last-accent-color.txt")
+    oldColor = ReadFile("last-accent-color.ignore.txt")
     newColor = string.match(
         measureColor:GetStringValue(),
         "([%l%u0-9][%l%u0-9][%l%u0-9][%l%u0-9][%l%u0-9][%l%u0-9])"
@@ -17,7 +17,7 @@ function Update()
         print("AccentColorSyncer: color has changed from #" .. oldColor .. " to #" .. newColor)
         SKIN:Bang("!WriteKeyValue", "Variables", "color-accent", newColor, "#@#Config.inc")
         SKIN:Bang("!RefreshGroup", "AccentColorDependent")
-        WriteFile("last-accent-color.txt", newColor)
+        WriteFile("last-accent-color.ignore.txt", newColor)
     end
 end
 

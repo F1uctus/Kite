@@ -1,20 +1,27 @@
 # Kite <img align="left" width=48 height=48 src="https://github.com/F1uctus/Kite/blob/master/%40Screenshots/Kite.jpg">
 
-## Small Rainmeter skin-pack with great flexibility
+### Small Rainmeter skin-pack with great flexibility
 
 This suite was made to show [pyrmont](https://github.com/F1uctus/pyrmont) static skin generator possibilities.
 
 `Config.inc` can be edited to use custom suite scale, colors, dark/light themes and English/Russian localizations.
 
-## Requirements
+### Requirements
 
-To get Kite fully working, you must have Python 3 installed on your machine.
+- Place your GitHub feed key to the file `.\GitHub\Feed\token-github-feed.ignore.txt`
 
-Also, this skin pack uses the [`FrostedGlass`](https://github.com/TheAzack9/FrostedGlass) plugin.
+- Place your OpenWeatherMap API key to the file `.\Weather\token-openweathermap.ignore.inc` with format:
+```
+[Variables]
+    token-openweathermap=YOUR_API_KEY
+```
 
-There is a micro C# program allowing to get Windows accent color,
-so you'll need .NET Framework 4.7.2 or greater.
+- If you are planning to customize this suite, `pyrmont` requires Python 3 on your machine. Also, it is used for GitHub feed scraping.
 
-## Screenshots
+- [FrostedGlass](https://github.com/TheAzack9/FrostedGlass) plugin.
 
-![Kite](https://github.com/F1uctus/Kite/blob/master/%40Screenshots/Kite-beta4.png)
+- There is a micro C# program allowing to get Windows accent color, so you'll need .NET Framework 4.7.2 or greater.
+
+### Screenshots
+
+![Kite](https://github.com/F1uctus/Kite/blob/master/%40Screenshots/Kite-1.0.png)
