@@ -24,4 +24,4 @@ This suite was made to show [pyrmont](https://github.com/F1uctus/pyrmont) static
 
 ### Screenshots
 
-![Kite](https://github.com/F1uctus/Kite/blob/master/%40Screenshots/Kite-1.0.png)
+![Kite](https://github.com/F1uctus/Kite/blob/master/%40Screenshots/Kite-1.0.1.png)
