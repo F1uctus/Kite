@@ -1,0 +1,1 @@
+robocopy . ..\Kite-rls-dev *.pyrm *.py *.ini *.inc *.lua *.txt *.exe *.dll *.ttf *.otf *.png *.jpg *.jpeg /s /xf *.ignore.* /xd "@Screenshots" "Timetable"

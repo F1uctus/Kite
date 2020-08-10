@@ -1,1 +1,1 @@
-robocopy . ..\Kite-UI *.ini *.inc *.lua *.txt *.exe *.dll *.ttf *.otf *.png *.jpg *.jpeg /s /xf *.ignore.* /xd "@Screenshots" "pyrmont" "Timetable"
+robocopy . ..\Kite-rls-plain *.py *.ini *.inc *.lua *.txt *.exe *.dll *.ttf *.otf *.png *.jpg *.jpeg /s /xf *.ignore.* /xd "@Screenshots" "pyrmont" "Timetable"
