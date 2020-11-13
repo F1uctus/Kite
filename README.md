@@ -1,6 +1,6 @@
 # Kite <img align="left" width=48 height=48 src="/%40Screenshots/Kite.jpg">
 
-### Small Rainmeter skin-pack with great flexibility
+### Small Rainmeter suite with great flexibility
 
 This suite was made to show [pyrmont](https://github.com/F1uctus/pyrmont) static skin generator possibilities.
 
