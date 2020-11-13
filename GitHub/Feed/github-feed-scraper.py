@@ -1,10 +1,12 @@
 import sys
 import requests
+from pathlib import Path
 from bs4 import BeautifulSoup
 
+script_dir = Path(__file__).parent
 
 def get_token() -> str:
-    with open('token-github-feed.ignore.txt', 'r') as f:
+    with open(script_dir / 'token-github-feed.ignore.txt', 'r') as f:
         return f.read()
 
 
@@ -12,12 +14,14 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("options: <user-name> <news-limit>")
         exit(1)
-    elif len(sys.argv) < 3:
-        user_name = sys.argv[1]
+
+    user_name = sys.argv[1]
+    if len(sys.argv) < 3:
         limit = 20
     else:
-        user_name = sys.argv[1]
         limit = int(sys.argv[2])
+
+    debug = any(arg for arg in sys.argv if arg in {"--debug", "-d"})
 
     URL = f"https://github.com/{user_name}.private.atom?token={get_token()}"
 
@@ -25,9 +29,13 @@ if __name__ == "__main__":
     entry = BeautifulSoup(page.content, "html.parser").feed.entry
 
     i = 0
-    with open("last-request.ignore.txt", "w") as out_file:
+    with open(script_dir / "last-request.ignore.txt", "w") as out_file:
         while entry is not None and i < limit:
             title = entry.title.string
+
+            if debug:
+                print(title)
+
             description_div = BeautifulSoup(
                 entry.content.string,
                 "html.parser"
