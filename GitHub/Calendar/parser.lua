@@ -61,12 +61,15 @@ function GetColor(x, y)
         return "10101020"
     end
     r, g, b = Hex2RGB(accentColor)
-    opacity = Clamp(math.floor(blocks[x][y] / maxCount * 255) + 40, 0, 255)
+    opacity = Clamp(math.ceil(blocks[x][y] / maxCount * 255) + 5, 0, 255)
     return r .. ',' .. g .. ',' .. b .. ',' .. opacity
 end
 
 function Clamp(num, lower, upper)
-    assert(num and lower and upper, 'error: Clamp(num, lower, upper)')
+    assert(
+        num and lower and upper,
+        'error: Clamp(' .. num .. ', ' .. lower .. ', ' .. upper .. ')'
+    )
     return math.max(lower, math.min(upper, num))
 end
 
