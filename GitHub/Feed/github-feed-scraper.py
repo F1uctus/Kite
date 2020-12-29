@@ -10,6 +10,10 @@ def get_token() -> str:
         return f.read()
 
 
+def parse(value):
+    return BeautifulSoup(value, "html.parser")
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("options: <user-name> <news-limit>")
@@ -26,20 +30,19 @@ if __name__ == "__main__":
     URL = f"https://github.com/{user_name}.private.atom?token={get_token()}"
 
     page = requests.get(URL)
-    entry = BeautifulSoup(page.content, "html.parser").feed.entry
+    entry = parse(page.content).feed.entry
 
     i = 0
-    with open(script_dir / "last-request.ignore.txt", "w") as out_file:
+    with open(script_dir / "last-request.ignore.txt", "w+") as out_file:
         while entry is not None and i < limit:
             title = entry.title.string
+            link_user = entry.author.uri.string
+            link_repo = entry.link['href']
 
             if debug:
                 print(title)
 
-            description_div = BeautifulSoup(
-                entry.content.string,
-                "html.parser"
-            ).find("div", ["repo-description"])
+            description_div = parse(entry.content.string).find("div", ["repo-description"])
 
             description = ""
             if description_div is not None \
@@ -47,7 +50,13 @@ if __name__ == "__main__":
                and description_div.p.string is not None:
                 description = description_div.p.string
 
-            out_file.write(f"title[{title}]; description[{description}]\n")
+            out_file.write(
+                f"title[{title}]"
+                f"description[{description}]"
+                f"link_user[{link_user}]"
+                f"link_repo[{link_repo}]"
+                "\n"
+            )
 
             i += 1
             entry = entry.find_next("entry")
