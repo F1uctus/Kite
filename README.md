@@ -25,7 +25,7 @@ With `ThemeSyncer` enabled, config values are changed according to current Windo
 ### Screenshots
 
 Light:
-![Kite](/%40Screenshots/Kite-1.0.2.png)
+![Kite](/%40Screenshots/Kite-1.0.3.png)
 
 Dark:
-![Kite](/%40Screenshots/Kite-1.0.2b.png)
+![Kite](/%40Screenshots/Kite-1.0.3b.png)
