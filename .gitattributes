@@ -1,2 +1,3 @@
-*ini diff=utf16text
-*inc diff=utf16text
+*.ini diff=utf16text
+*.inc diff=utf16text
+*.pyrm diff=utf16text
