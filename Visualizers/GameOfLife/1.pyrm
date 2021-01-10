@@ -1,0 +1,46 @@
+[Rainmeter]
+    Update=1000
+    AccurateText=1
+    DefaultUpdateDivider=-1
+    Group=OSThemeDependent
+    ContextTitle="Pause simulation"
+    ContextAction=[!PauseMeasure MeasureScript]
+    ContextTitle2="Resume simulation"
+    ContextAction2=[!UnpauseMeasure MeasureScript]
+    ContextTitle3="Random simulation"
+    ContextAction3=[!CommandMeasure MeasureScript "RandomizeGrid()"]
+    ContextTitle4="Clear simulation"
+    ContextAction4=[!CommandMeasure MeasureScript "ResetGrid()"]
+
+[Variables]
+    @include-cfg=#@#Config.inc
+    @include-frostedglass=#@#FrostedGlass.inc
+    skinw=(#s# * 300)
+    skinh=(#s# * 300)
+    [[
+        # count should be odd to fit in window
+        globals()['CELLS_COUNT'] = 25
+        e(f"cells-count={CELLS_COUNT}")
+    ]]
+
+[MeasureScript]
+    Measure=Script
+    ScriptFile=game.lua
+    UpdateDivider=1
+
+[BG]
+    Meter=Shape
+    MeterStyle=BackgroundStyle
+
+[[
+    for y in range(CELLS_COUNT):
+        for x in range(CELLS_COUNT):
+            e(f"""
+            [MeterCellX{x}Y{y}]
+                Meter=Shape
+                Shape=Rectangle (#s# * {round(15 + x * 10.88, 2)}),(#s# * {round(15 + y * 10.88, 2)}),(#s# * 9),(#s# * 9),(#s# * 4),(#s# * 4) | StrokeWidth 0 | Fill Color [&MeasureScript:GetCellColor({x}, {y})]
+                DynamicVariables=1
+                Group=Cells
+                LeftMouseUpAction=[!CommandMeasure MeasureScript "ToggleCell({x}, {y})"]
+            """)
+]]
