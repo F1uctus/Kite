@@ -1,0 +1,227 @@
+[Rainmeter]
+    Update=60000
+    AccurateText=1
+    DefaultUpdateDivider=-1
+    Group=OSThemeDependent
+    OnRefreshAction=[!ZPos "-2"]
+
+[Variables]
+    @include-cfg=#@#Config.inc
+    @include-frostedglass=#@#FrostedGlass.inc
+    @include-translations=#@#Langs/#lang#.inc
+    @include-token-owm=token-openweathermap.ignore.inc
+    ; size
+    skinw=(#s# * 300)
+    skinh=(#s# * 270)
+    
+    sunrise-time=#loading#
+    sunset-time=#loading#
+    elapsed-daytime-percents=0
+
+; #################### MEASURES
+
+[MeasureWeather]
+    Measure=WebParser
+    URL=http://api.openweathermap.org/data/2.5/weather?id=#city-id#&units=#units#&lang=#lang-code#&appid=#token-openweathermap#
+    RegExp=(?siU)^.*description":"(.*)".*temp":(.*),.*feels_like":(.*),.*pressure":(\d+),.*humidity":(\d+).*speed":(.+),.*sunrise":(\d+),.*sunset":(\d+)}.*name":"(.*)".*$
+    UpdateRate=1
+    UpdateDivider=1
+    FinishAction=[!UpdateMeasureGroup Weather][!UpdateMeter *][!Redraw]
+
+; Missing of 2-nd measure is OK.
+[[
+    measures = {
+        1: 'WeatherDescription',
+        3: 'TempRaw',
+        4: 'Pressure',
+        5: 'Humidity',
+        6: 'Wind',
+        7: 'SunriseUnix',
+        8: 'SunsetUnix',
+        9: 'SelectedCity',
+    }
+    for idx, name in measures.items():
+        e(f"""
+        [Measure{name}]
+            Measure=WebParser
+            Group=Weather
+            URL=[MeasureWeather]
+            StringIndex={idx}
+            Substitute="":"#loading#"
+        """)
+]]
+
+[MeasureTemp]
+    Measure=Calc
+    Group=Weather
+    Formula=round(MeasureTempRaw, 1)
+
+[MeasurePressure_mmHg]
+    Measure=Calc
+    Group=Weather
+    Formula=MeasurePressure * 0.750063755419211
+
+[MeasureTimeScript]
+    Measure=Script
+    Group=Weather
+    ScriptFile=time-measuring.lua
+
+[MeasureTimeInPercents]
+    Measure=Calc
+    Group=Weather
+    Formula=#elapsed-daytime-percents#
+    DynamicVariables=1
+
+; #################### METERS
+
+[MeterBackground]
+    Meter=Shape
+    MeterStyle=BackgroundStyle
+
+[MeterTitle]
+    Meter=String
+    MeasureName=MeasureSelectedCity
+    MeterStyle=TitleStringStyle
+    Text="%1"
+    ClipStringH=(#s# * 25)
+    LeftMouseUpAction=["https://openweathermap.org/city/#cityid#"]
+    ToolTipText="Forecast on OpenWeatherMap"
+
+[MeterTitle2]
+    Meter=String
+    MeasureName=MeasureWeatherDescription
+    MeterStyle=RegularStringStyle
+    InlineSetting=Case | Sentence
+    X=(#s# * 15)
+    Y=(#s# * 10)R
+    Text="%1"
+    ClipStringW=(#skinw# - (#s# * #margin-x# * 2))
+    ClipStringH=(#s# * 25)
+
+[MeterTemp]
+    Meter=String
+    MeasureName=MeasureTemp
+    MeterStyle=RegularStringStyle
+    X=r
+    Y=(#s# * 85)
+    FontFace=#font-face-accent#
+    FontSize=#font-size-accent#
+    Text=%1°
+
+; #################### Sunrise/sunset
+
+[MeterTimeLineBG]
+    Meter=Roundline
+    X=(#skinw# - (#s# * 85))
+    Y=(#s# * 142)
+    StartAngle=(rad(200))
+    RotationAngle=(rad(140))
+    LineLength=(#s# * 50)
+    LineStart=(#s# * 47)
+    LineColor=#color-highlight#,#opacity-highlight#
+    Solid=1
+    AntiAlias=1
+
+[MeterTimeLine]
+    Meter=Roundline
+    MeterStyle=MeterTimeLineBG
+    MeasureName=MeasureTimeInPercents
+    X=r
+    Y=r
+    LineColor=#color-accent#
+    UpdateDivider=1
+
+[MeterSunriseTime]
+    Meter=String
+    MeterStyle=RegularStringStyle
+    StringAlign=Center
+    FontFace=#font-face-accent#
+    FontSize=(#s# * 12)
+    X=(#skinw# - (#s# * 135))
+    Y=(-#s# * 10)R
+    Text=#sunrise-time#
+    DynamicVariables=1
+
+[MeterSunsetTime]
+    Meter=String
+    MeterStyle=RegularStringStyle | MeterSunriseTime
+    X=(#skinw# - (#s# * 35))
+    Y=r
+    Text=#sunset-time#
+
+[MeterSunImage]
+    Meter=Image
+    ImagePath="icons\"
+    ImageName=sun.png
+    X=(#skinw# - (#s# * 102))
+    Y=(-#s# * 20)r
+    W=(#s# * 35)
+    H=(#s# * 35)
+
+; #################### Wind
+
+[MeterWindImage]
+    Meter=Image
+    ImagePath="icons\"
+    ImageName=wind.png
+    ImageTint=#color-accent#
+    X=[MeterTitle:X]
+    Y=(#s# * 165)
+    W=(#s# * 25)
+    H=(#s# * 25)
+
+[MeterWind]
+    Meter=String
+    MeterStyle=RegularStringStyle
+    X=(#s# * 5)R
+    Y=(#s# * 4)r
+    Text=#wind#
+
+[MeterWindValue]
+    Meter=String
+    StringAlign=Right
+    MeasureName=Measurewind
+    MeterStyle=RegularStringStyle
+    X=(#skinw# - (#s# * 15))
+    Y=r
+    Text="%1 #mps#"
+
+; #################### Humidity
+
+[MeterHumidityImage]
+    Meter=Image
+    MeterStyle=MeterWindImage
+    ImageName=Humidity.png
+    Y=(#s# * 8)R
+
+[MeterHumidity]
+    Meter=String
+    MeterStyle=RegularStringStyle | MeterWind
+    Text=#humidity#
+
+[MeterHumidityValue]
+    Meter=String
+    StringAlign=Right
+    MeasureName=MeasureHumidity
+    MeterStyle=RegularStringStyle | MeterWindValue
+    Text="%1 %"
+
+; #################### Pressure
+
+[MeterPressureImage]
+    Meter=Image
+    MeterStyle=MeterWindImage
+    ImageName=Pressure.png
+    Y=(#s# * 8)R
+
+[MeterPressure]
+    Meter=String
+    MeterStyle=RegularStringStyle | MeterWind
+    Text=#pressure#
+
+[MeterPressureValue]
+    Meter=String
+    StringAlign=Right
+    MeasureName=MeasurePressure_mmHg
+    MeterStyle=RegularStringStyle | MeterWindValue
+    Text="%1 #mmHg#"

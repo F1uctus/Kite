@@ -1,0 +1,92 @@
+[Rainmeter]
+    Update=1000
+    AccurateText=1
+    DefaultUpdateDivider=-1
+    Group=OSThemeDependent
+
+[[
+    globals()['ICON_SIZE'] = 50
+    globals()['ICONS'] = {
+        # Habr
+        "h": (
+            "98,159,188",
+            "[!DeactivateConfigGroup FeedGroup][!ActivateConfig Kite\Reader\Habr]"
+        ),
+        # GitHub
+        "gh": (
+            "35,40,45",
+            "[!DeactivateConfigGroup FeedGroup][!ActivateConfig Kite\Reader\GitHub\Feed]"
+        ),
+        # TechCrunch
+        "tc": (
+            "10,170,105",
+            "[!DeactivateConfigGroup FeedGroup][!ActivateConfig Kite\Reader\TechCrunch]"
+        ),
+        #" 📧 ": (
+        #    "237,68,54",
+        #    "[!DeactivateConfigGroup FeedGroup][!ActivateConfig Kite\Reader\Gmail]"
+        #),
+        #"owm": (
+        #    "237,68,54",
+        #    "[!DeactivateConfigGroup FeedGroup][!ActivateConfig Kite\Reader\Gmail]"
+        #)
+    }
+]]
+
+[Variables]
+    @include-cfg=#@#Config.inc
+    
+    [[
+        e(f"skinw=(#s# * {ICON_SIZE + 20})\r\n")
+        e(f"skinh=(#s# * {(ICON_SIZE + 10) * 3 + 10})\r\n")
+        e(f"icon-size=(#s# * {ICON_SIZE})\r\n")
+    ]]
+
+    top-l=0,0
+    top-r=#icon-size#,0
+    bot-l=0,#icon-size#
+    bot-r=#icon-size#,#icon-size#
+
+    mid-l=0,(#icon-size# / 2)
+    top-m=(#icon-size# / 2),0
+    bot-m=(#icon-size# / 2),#icon-size#
+    mid-r=#icon-size#,(#icon-size# / 2)
+
+; #################### MEASURES
+
+; #################### METERS
+
+; #################### Buttons
+
+[[
+    curves = [
+        "#top-m#,#top-l#",
+        "#mid-r#,#top-r#",
+        "#bot-m#,#bot-r#",
+        "#mid-l#,#bot-l#"
+    ]
+    for i, icon in enumerate(ICONS.items()):
+        label, props = icon
+        color, on_click = props
+        e(f"""
+        [MeterIcon{i}]
+            Meter=Shape
+            X=10
+            Y=(#s# * (10 + {(ICON_SIZE + 10) * i}))
+            Shape=Path Squircle | StrokeWidth 1 | Stroke Color #color-highlight#,50 | Fill Color {color}
+            Squircle=#mid-l# {''.join(f' | CurveTo {c}' for c in curves)}
+            LeftMouseUpAction={on_click}
+
+        [MeterIcon{i}Label]
+            Meter=String
+            MeterStyle=TitleStringStyle
+            FontColor=255,255,255
+            FontSize=(#font-size-title# - (#font-size-title# * ({len(label) / 10})))
+            StringAlign=CenterCenter
+            Text={label}
+            X=(#skinw# / 2)
+            Y=(#s# * (10 + {ICON_SIZE / 2} + {(ICON_SIZE + 10) * i}))
+            W={ICON_SIZE}
+            H={ICON_SIZE}
+        """)
+]]

@@ -1,0 +1,146 @@
+[Rainmeter]
+    Update=60000
+    AccurateText=1
+    DefaultUpdateDivider=-1
+    Group=OSThemeDependent | FeedGroup
+    OnUpdateAction=[!Log "Update loop"][!CommandMeasure MeasureRequest "Run"]
+    OnRefreshAction=[!ZPos "-2"]
+
+[[
+    globals()['FEED_ENTRY_COUNT'] = 5
+    globals()['FEED_PAGES_COUNT'] = 1
+    globals()['TITLE_HEIGHT'] = 35
+    globals()['ENTRY_HEIGHT'] = 55
+]]
+
+[Variables]
+    @include-cfg=#@#Config.inc
+    @include-frostedglass=#@#FrostedGlass.inc
+    @include-translations=#@#Langs/#lang#.inc
+    ; size
+    skinw=(#s# * 500)
+    [[
+        e(f"""skinh=(#s# * {0
+            + 15
+            + TITLE_HEIGHT + 5
+            + FEED_ENTRY_COUNT * ENTRY_HEIGHT
+            + (FEED_ENTRY_COUNT - 1) * 5
+            + 15
+        })""")
+    ]]
+
+    title=GitHub
+    main-url=https://github.com
+
+    user-name=F1uctus
+
+; #################### MEASURES
+
+[MeasureRequest]
+    Measure=Plugin
+    Plugin=RunCommand
+    Program=python #CURRENTPATH#github-feed-scraper.py #user-name# 10
+    State=Hide
+    OutputType=ANSI
+    FinishAction=[!EnableMeasure MeasureExtractor][!UpdateMeasure MeasureExtractor]
+
+[MeasureExtractor]
+    Measure=WebParser
+    Url=file://#CURRENTPATH#last-request.ignore.txt
+    UpdateRate=1
+    Disabled=1
+    FinishAction=[!UpdateMeasureGroup Items][!UpdateMeterGroup Items][!Redraw]
+    [[
+        e("RegExp=(?siU)"
+            + (r"title\[(.*)\]description\[(.*)\]link_user\[(.*)\]link_repo\[(.*)\].*"
+            * FEED_ENTRY_COUNT * FEED_PAGES_COUNT))
+    ]]
+
+[[
+    template = """
+        Measure=WebParser
+        Group=Items
+        Url=[MeasureExtractor]
+    """
+    for i in range(FEED_ENTRY_COUNT):
+        ii = i * 4
+        e(f"""
+        [MeasureItem{i}Title]
+            {template}
+            StringIndex={ii + 1}
+            Substitute="":"#loading#"
+
+        [MeasureItem{i}Description]
+            {template}
+            StringIndex={ii + 2}
+            Substitute="":"N/A"
+
+        [MeasureItem{i}UserLink]
+            {template}
+            StringIndex={ii + 3}
+
+        [MeasureItem{i}RepoLink]
+            {template}
+            StringIndex={ii + 4}
+        """)
+]]
+
+; #################### METERS
+
+[MeterBackground]
+    Meter=Shape
+    MeterStyle=BackgroundStyle
+
+[MeterTitle]
+    Meter=String
+    MeterStyle=TitleStringStyle
+    LeftMouseUpAction=["#main-url#"]
+    ToolTipText="Open in browser"
+
+; ####################
+
+[[
+    for i in range(FEED_ENTRY_COUNT):
+        e(f"""
+        [MeterItem{i}Background]
+            Meter=Shape
+            Shape=Rectangle \
+                    #margin-x#, \
+                    (#s# * (#margin-y# + {TITLE_HEIGHT + 5 + i * (ENTRY_HEIGHT + 5)})), \
+                    (#skinw# - (#margin-x# * 2)), \
+                    (#s# * {ENTRY_HEIGHT}), \
+                    #corner-radius# \
+                | Fill Color #color-highlight#,10 \
+                | StrokeWidth 0
+            DynamicVariables=1
+
+        [MeterItem{i}Title]
+            Meter=String
+            Group=Items
+            MeterStyle=RegularStringStyle
+            MeasureName=MeasureItem{i}Title
+            InlinePattern=\b(starred|forked|created|public|following)\b
+            InlineSetting=Color | #color-accent#
+            X=(#margin-x# + (#s# * 8))
+            Y=(#s# * (#margin-y# + {TITLE_HEIGHT + 12 + i * (ENTRY_HEIGHT + 5)}))
+            W=(#skinw# - (#margin-x# * 2) - (#s# * 8))
+            H=(#s# * 25)
+            LeftMouseUpAction=["[MeasureItem{i}UserLink]"]
+            DynamicVariables=1
+
+        [MeterItem{i}Description]
+            Meter=String
+            Group=Items
+            MeterStyle=RegularStringStyle
+            FontSize=(#s# * 11)
+            FontColor=#color-font#,100
+            MeasureName=MeasureItem{i}Description
+            X=(#margin-x# + (#s# * 8))
+            Y=(#s# * -2)R
+            W=(#skinw# - (#margin-x# * 2) - (#s# * 8))
+            H=(#s# * 25)
+            ToolTipText=%1
+            LeftMouseUpAction=["[MeasureItem{i}RepoLink]"]
+            DynamicVariables=1
+        """)
+]]

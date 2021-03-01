@@ -1,0 +1,187 @@
+[Rainmeter]
+    Update=10000
+    AccurateText=1
+    DefaultUpdateDivider=-1
+    Group=OSThemeDependent | FeedGroup
+    OnRefreshAction=[!ZPos "-2"]
+
+[[
+    globals()['FEED_ENTRY_COUNT'] = 10
+    globals()['FEED_PAGES_COUNT'] = 2
+    globals()['TITLE_HEIGHT'] = 35
+    globals()['ENTRY_HEIGHT'] = 25
+]]
+
+[Variables]
+    @include-cfg=#@#Config.inc
+    @include-frostedglass=#@#FrostedGlass.inc
+    @include-translations=#@#Langs/#lang#.inc
+    ; size
+    skinw=(#s# * 500)
+    [[
+        e(f"""skinh=(#s# * {0
+            + 15
+            + TITLE_HEIGHT + 5
+            + FEED_ENTRY_COUNT * ENTRY_HEIGHT
+            + (FEED_ENTRY_COUNT - 1) * 5
+            + 15
+        })""")
+    ]]
+    
+    ; override lang, english Habr has little news.
+    lang-code=ru
+
+    ; regex for parsing 1 item section.
+    q=(?(?=.*<item>).*<title><\!\[CDATA\[(.*)\]\]>.*<link>(.*)<\/link>.*<\/item>.*)
+    ;				               1 title			         2 link
+
+    title=Habr
+    main-url=https://habr.com/#lang-code#/
+    
+    rss-url-en=https://habr.com/en/rss/all/all?limit=20
+    rss-url-ru=https://habr.com/ru/rss/best/daily?limit=20
+    rss-url=#rss-url-[#lang-code]#
+    [[
+        for i in range(FEED_ENTRY_COUNT):
+            e(f"item{i}-link=[MeasureItem{i}Link]\r\n")
+            e(f"item{i}-bg-color=#color-highlight#,10\r\n")
+    ]]
+
+; #################### MEASURES
+
+[MeasureRequest]
+    Measure=WebParser
+    Url=#rss-url#
+    UpdateDivider=1
+    UpdateRate=6
+    FinishAction=[!UpdateMeasureGroup Items][!UpdateMeterGroup Items][!Redraw]
+    [[
+        e("RegExp=(?siU)" + ("#q#" * FEED_ENTRY_COUNT * FEED_PAGES_COUNT))
+    ]]
+
+[[
+    template = """
+        Measure=WebParser
+        Group=Items
+        Url=[MeasureRequest]
+    """
+    for i in range(FEED_ENTRY_COUNT * FEED_PAGES_COUNT):
+        ii = i * 2
+        e(f"""
+        [MeasureItem{i}Title]
+            {template}
+            StringIndex={ii + 1}
+            Substitute="":"#loading#"
+
+        [MeasureItem{i}Link]
+            {template}
+            StringIndex={ii + 2}
+        """)
+]]
+
+; #################### METERS
+
+[BG]
+    Meter=Shape
+    MeterStyle=BackgroundStyle
+
+[MeterTitle]
+    Meter=String
+    MeterStyle=TitleStringStyle
+    LeftMouseUpAction=["#main-url#"]
+    ToolTipText="Open in browser"
+
+; #################### Listing arrows
+
+[ArrowNext]
+    Meter=String
+    MeterStyle=RegularStringStyle
+    X=(#skinw# - #margin-x#)
+    Y=r
+    FontSize=#font-size-title#
+    FontColor=#color-accent#
+    StringAlign=Right
+    Text="↓"
+    [[
+        bang = "".join(
+            (f"[!SetOption MeterItem{i}Title MeasureName MeasureItem{FEED_ENTRY_COUNT + i}Title]"
+             f"[!SetVariable item{i}-link \"[MeasureItem{FEED_ENTRY_COUNT + i}Link]\"]")
+            for i in range(FEED_ENTRY_COUNT)
+        ) + ("[!HideMeter ArrowNext]"
+              "[!ShowMeter ArrowPrev]"
+              "[!UpdateMeterGroup Items]"
+              "[!Redraw]")
+        e(f"LeftMouseUpAction={bang}")
+    ]]
+
+
+[ArrowPrev]
+    Meter=String
+    MeterStyle=RegularStringStyle | ArrowNext
+    Text="↑"
+    Hidden=1
+    [[
+        bang = "".join(
+            (f"[!SetOption MeterItem{i}Title MeasureName MeasureItem{i}Title]"
+             f"[!SetVariable item{i}-link \"[MeasureItem{i}Link]\"]")
+            for i in range(FEED_ENTRY_COUNT)
+        ) + ("[!HideMeter ArrowPrev]"
+              "[!ShowMeter ArrowNext]"
+              "[!UpdateMeterGroup Items]"
+              "[!Redraw]")
+        e(f"LeftMouseUpAction={bang}")
+    ]]
+
+
+; #################### RSS feed items
+
+[[
+    for i in range(FEED_ENTRY_COUNT):
+        e(f"""
+        [MeterItem{i}Background]
+            Meter=Shape
+            Shape=Rectangle \
+                #margin-x#, \
+                (#s# * (#margin-y# + {TITLE_HEIGHT + 5 + i * (ENTRY_HEIGHT + 5)})), \
+                (#skinw# - (#margin-x# * 2)), \
+                (#s# * {ENTRY_HEIGHT}), \
+                #corner-radius# \
+                | Fill Color #item{i}-bg-color# \
+                | StrokeWidth 0
+            MouseOverAction=\
+                [!SetVariable item{i}-bg-color #color-highlight#,#opacity-highlight#] \
+                [!UpdateMeter #CURRENTSECTION#] \
+                [!Redraw]
+            MouseLeaveAction=\
+                [!SetVariable item{i}-bg-color #color-highlight#,10] \
+                [!UpdateMeter #CURRENTSECTION#] \
+                [!Redraw]
+            LeftMouseDownAction=\
+                [!SetVariable item{i}-bg-color #color-accent#] \
+                [!UpdateMeter #CURRENTSECTION#] \
+                [!Redraw]
+            LeftMouseUpAction=\
+                [!SetVariable item{i}-bg-color #color-highlight#,10] \
+                [!UpdateMeter #CURRENTSECTION#] \
+                [!Redraw] \
+                ["#item{i}-link#"]
+            DynamicVariables=1
+        """)
+        
+        e(f"""
+        [MeterItem{i}Title]
+            Meter=String
+            MeterStyle=RegularStringStyle
+            MeasureName=MeasureItem{i}Title
+            X=(#margin-x# + (#s# * 5))
+            Y=(#s# * (#margin-y# + {TITLE_HEIGHT + 18 + i * (ENTRY_HEIGHT + 5)}))
+            W=(#skinw# - (#margin-x# * 2) - (#s# * 5))
+            H=(#s# * 25)
+            InlinePattern=^\[.*\]
+            InlineSetting=Color | #color-accent#
+            StringAlign=LeftCenter
+            ToolTipText=%1
+            Group=Items
+            DynamicVariables=1
+        """)
+]]

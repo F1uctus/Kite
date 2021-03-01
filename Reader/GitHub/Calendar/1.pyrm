@@ -1,0 +1,74 @@
+[Rainmeter]
+    Update=10000
+    AccurateText=1
+    DefaultUpdateDivider=6
+    Group=OSThemeDependent
+    OnRefreshAction=[!ZPos "-2"]
+
+[Variables]
+    @include-cfg=#@#Config.inc
+    @include-frostedglass=#@#FrostedGlass.inc
+    @include-translations=#@#Langs/#lang#.inc
+    ; size
+    skinw=(#s# * 500)
+    skinh=(#s# * 150)
+
+    github-username=F1uctus
+
+; #################### MEASURES
+
+[MeasureGraph]
+    Measure=WebParser
+    Url=http://github-calendar.herokuapp.com/commits/#github-username#
+    UpdateRate=1
+    RegExp=(?siU).*\[(.*)\].*
+    FinishAction=[!UpdateMeasure "MeasureScript"]
+
+[MeasureScript]
+    Measure=Script
+    ScriptFile=parser.lua
+
+; #################### METERS
+
+[MeterBackground]
+    Meter=Shape
+    MeterStyle=BackgroundStyle
+
+[MeterTitle]
+    Meter=String
+    MeterStyle=TitleStringStyle
+    Text=github.com/#github-username#
+    InlinePattern=#github-username#
+    InlineSetting=Color | #color-accent#
+    LeftMouseUpAction=["https://github.com/#github-username#"]
+
+[MeterTitle2]
+    Meter=String
+    MeterStyle=RegularStringStyle
+    Text=[&MeasureScript:GetSum()] contributions in the past year
+    InlinePattern=^(\d+)
+    InlineSetting=Color | #color-accent#
+    X=r
+    Y=R
+    DynamicVariables=1
+    Group=Contributions
+
+; ####################
+
+[[
+    for y in range(7):
+        for x in range(53):
+            e(f"""
+            [MeterCellX{x + 1}Y{y + 1}]
+                Meter=Shape
+                Shape=Rectangle \
+                        (#margin-x# + #s# * {round(x * 8.9, 2)}), \
+                        (#margin-y# + #s# * {round(60 + y * 8.9, 2)}), \
+                        (#s# * 6),(#s# * 6), \
+                        (#s# * 2),(#s# * 2) \
+                    | StrokeWidth 0 \
+                    | Fill Color [&MeasureScript:GetColor({x + 1}, {y + 1})]
+                DynamicVariables=1
+                Group=Contributions
+            """)
+]]
