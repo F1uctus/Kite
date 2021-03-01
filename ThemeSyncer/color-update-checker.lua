@@ -34,6 +34,8 @@ function Update()
     end
     if changed then
         SKIN:Bang("!RefreshGroup", "OSThemeDependent")
+        Wait(10)
+        SKIN:Bang("!ZPosGroup", "-2", "OSThemeDependent")
     end
     WriteFile("last-theme.ignore.txt", newData)
 end
@@ -60,4 +62,10 @@ function WriteFile(path, content)
     f:write(content)
     f:close()
     return true
+end
+
+function Wait(milliseconds)
+    -- Busy wait is bad, but there are not many better alternatives...
+    local duration = os.time() + milliseconds / 1000
+    while os.time() < duration do end
 end
