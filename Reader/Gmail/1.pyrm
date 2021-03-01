@@ -1,0 +1,205 @@
+[Rainmeter]
+    Update=20000
+    AccurateText=1
+    DefaultUpdateDivider=-1
+    Group=OSThemeDependent
+    OnUpdateAction=[!Log "Update loop"][!CommandMeasure MeasureRequest "Run"]
+    OnRefreshAction=[!ZPos "-2"]
+
+[[
+    globals()['FEED_ENTRY_COUNT'] = 3
+    globals()['FEED_PAGES_COUNT'] = 2
+    globals()['TITLE_HEIGHT'] = 35
+    globals()['ENTRY_HEIGHT'] = 50
+]]
+
+[Variables]
+    @include-cfg=#@#Config.inc
+    @include-frostedglass=#@#FrostedGlass.inc
+    @include-translations=#@#Langs/#lang#.inc
+    ; size
+    skinw=(#s# * 300)
+    [[
+        e(f"""skinh=(#s# * {0
+            + 15
+            + TITLE_HEIGHT + 5
+            + FEED_ENTRY_COUNT * ENTRY_HEIGHT
+            + (FEED_ENTRY_COUNT - 1) * 5
+            + 15
+        })""")
+    ]]
+
+    title=Gmail
+    main-url=https://mail.google.com/a/
+
+    [[
+        for i in range(FEED_ENTRY_COUNT):
+            e(f"item{i}-circle-color=0,0,0,0\r\n")
+    ]]
+
+; #################### MEASURES
+
+[MeasureRequest]
+    Measure=Plugin
+    Plugin=RunCommand
+    [[
+        e(f"Program=python #CURRENTPATH#gmail-reader.py {FEED_ENTRY_COUNT * FEED_PAGES_COUNT} unread inbox\r\n")
+    ]]
+    State=Hide
+    OutputType=ANSI
+    FinishAction=[!EnableMeasure MeasureExtractor][!UpdateMeasure MeasureExtractor]
+
+[MeasureExtractor]
+    Measure=WebParser
+    Url=file://#CURRENTPATH#last-request.ignore.txt
+    UpdateRate=1
+    Disabled=1
+    [[
+        e('RegExp=(?siU)' + (r'subject\[(.*)\]snippet\[(.*)\]unread\[(.*)\].*' * FEED_ENTRY_COUNT * FEED_PAGES_COUNT) + '\r\n')
+        e(f"""
+        FinishAction={''.join(
+                f'[!SetVariable "item{i}-circle-color" "[MeasureItem{i}Color]"]'
+                for i in range(FEED_ENTRY_COUNT)
+            ) + ('[!UpdateMeasureGroup Items]'
+                 '[!UpdateMeterGroup Items]'
+                 '[!Redraw]')
+        }
+        """)
+    ]]
+
+[[
+    template = """
+        Measure=WebParser
+        Group=Items
+        Url=[MeasureExtractor]
+    """
+    for i in range(FEED_ENTRY_COUNT * FEED_PAGES_COUNT):
+        ii = i * 3
+        e(f"""
+        [MeasureItem{i}Title]
+            {template}
+            StringIndex={ii + 1}
+            Substitute="":"#loading#"
+
+        [MeasureItem{i}Snippet]
+            {template}
+            StringIndex={ii + 2}
+            Substitute="":"N/A"
+
+        [MeasureItem{i}Color]
+            {template}
+            StringIndex={ii + 3}
+            Substitute="0":"0,0,0,0","1":"240,180,180,255"
+        """)
+]]
+
+; #################### METERS
+
+[BG]
+    Meter=Shape
+    MeterStyle=BackgroundStyle
+
+[MeterTitle]
+    Meter=String
+    MeterStyle=TitleStringStyle
+    LeftMouseUpAction=["#main-url#"]
+    ToolTipText="Open in browser"
+
+; #################### Listing arrows
+
+[[
+    if FEED_PAGES_COUNT > 1:
+        e(f'''
+        [ArrowNext]
+            Meter=String
+            MeterStyle=RegularStringStyle
+            X=(#skinw# - #margin-x#)
+            Y=r
+            FontSize=#font-size-title#
+            FontColor=#color-accent#
+            StringAlign=Right
+            Text="↓"
+            LeftMouseUpAction={
+                "".join(
+                    (f"[!SetOption MeterItem{i}Title MeasureName MeasureItem{FEED_ENTRY_COUNT + i}Title]"
+                     f"[!SetOption MeterItem{i}Snippet MeasureName MeasureItem{FEED_ENTRY_COUNT + i}Snippet]"
+                    ) for i in range(FEED_ENTRY_COUNT)
+                ) + ("[!HideMeter ArrowNext]"
+                     "[!ShowMeter ArrowPrev]"
+                     "[!UpdateMeterGroup Items]"
+                     "[!Redraw]")
+            }
+
+        [ArrowPrev]
+            Meter=String
+            MeterStyle=RegularStringStyle | ArrowNext
+            Text="↑"
+            Hidden=1
+            LeftMouseUpAction={
+                "".join(
+                    (f"[!SetOption MeterItem{i}Title MeasureName MeasureItem{i}Title]"
+                     f"[!SetOption MeterItem{i}Snippet MeasureName MeasureItem{i}Snippet]"
+                    ) for i in range(FEED_ENTRY_COUNT)
+                ) + ("[!HideMeter ArrowPrev]"
+                     "[!ShowMeter ArrowNext]"
+                     "[!UpdateMeterGroup Items]"
+                     "[!Redraw]")
+            }
+        ''')
+]]
+
+; #################### RSS feed items
+
+[[
+    for i in range(FEED_ENTRY_COUNT):
+        e(f"""
+        [MeterItem{i}Background]
+            Meter=Shape
+            Shape=Rectangle \
+                    #margin-x#, \
+                    (#s# * (#margin-y# + {TITLE_HEIGHT + 5 + i * (ENTRY_HEIGHT + 5)})), \
+                    (#skinw# - (#margin-x# * 2)), \
+                    (#s# * {ENTRY_HEIGHT}), \
+                    #corner-radius# \
+                | Fill Color #color-highlight#,10 \
+                | StrokeWidth 0
+            DynamicVariables=1
+
+        [MeterItem{i}Title]
+            Meter=String
+            Group=Items
+            MeterStyle=RegularStringStyle
+            MeasureName=MeasureItem{i}Title
+            X=(#margin-x# + (#s# * 5))
+            Y=(#s# * (#margin-y# + {TITLE_HEIGHT + 10 + i * (ENTRY_HEIGHT + 5)}))
+            W=(#skinw# - (#margin-x# * 2) - (#s# * 5))
+            H=(#s# * 25)
+            DynamicVariables=1
+
+        [MeterItem{i}Snippet]
+            Meter=String
+            Group=Items
+            MeterStyle=RegularStringStyle
+            MeasureName=MeasureItem{i}Snippet
+            FontSize=(#s# * 11)
+            FontColor=#color-font#,100
+            X=(#margin-x# + (#s# * 5))
+            Y=(#s# * -2)R
+            W=(#skinw# - (#margin-x# * 2) - (#s# * 5))
+            H=(#s# * 25)
+            ToolTipText=%1
+            DynamicVariables=1
+
+        [MeterItem{i}Label]
+            Meter=Shape
+            Group=Items
+            Shape=Ellipse \
+                    (#skinw# - (#margin-x# * 2) - (#s# * 5)), \
+                    (#s# * (#margin-y# + {TITLE_HEIGHT + 30 + i * (ENTRY_HEIGHT + 5)})), \
+                    #corner-radius#, \
+                    #corner-radius# \
+                | Fill Color #item{i}-circle-color# \
+                | StrokeWidth 0
+            DynamicVariables=1
+        """)
+]]
