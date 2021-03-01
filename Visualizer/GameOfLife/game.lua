@@ -10,9 +10,6 @@ function Initialize()
 end
 
 function Update()
-    if activeCellsCount == 0 then
-        return
-    end
     activeCellsCount = 0
 
     local newCells = { }
@@ -35,6 +32,20 @@ function Update()
             end
         end
     end
+
+    local equals = true
+    for x = 0, xs do
+        for y = 0, ys do
+            equals = equals and cells[x][y] == newCells[x][y]
+        end
+    end
+
+    if equals then 
+        ResetGrid()
+        RandomizeGrid()
+        return
+    end
+
     cells = newCells
 
     SKIN:Bang('!UpdateMeterGroup', 'Cells')
